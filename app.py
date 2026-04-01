@@ -2,8 +2,8 @@ from servicios import agregar_producto,mostrar_inventario,buscar_producto,actual
 from archivos import guardar_csv,cargar_csv
 
 inventario = []
-
-while True:
+activo = True
+while activo:
     print("\n1 Agregar")
     print("2 Mostrar")
     print("3 Buscar")
