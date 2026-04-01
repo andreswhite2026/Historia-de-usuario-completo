@@ -1,71 +1,87 @@
-def agregar_producto(inventario, nombre, precio, cantidad):
-    """Agrega un producto"""
-    inventario.append({
-        "nombre": nombre,
-        "precio": precio,
-        "cantidad": cantidad
-    })
+from servicios import agregar_producto,mostrar_inventario,buscar_producto,actualizar_producto,eliminar_producto,calcular_estadisticas
+from archivos import guardar_csv,cargar_csv
 
+inventario = []
 
-def mostrar_inventario(inventario):
-    """Muestra productos"""
-    if len(inventario) == 0:
-        print("No hay productos")
-    else:
-        for p in inventario:
-            print(p["nombre"], "-", p["precio"], "-", p["cantidad"])
+while True:
+    print("\n1 Agregar")
+    print("2 Mostrar")
+    print("3 Buscar")
+    print("4 Actualizar")
+    print("5 Eliminar")
+    print("6 Estadisticas")
+    print("7 Guardar")
+    print("8 Cargar")
+    print("9 Salir")
 
+    try:
+        op = int(input("Opcion: "))
 
-def buscar_producto(inventario, nombre):
-    """Busca producto"""
-    for p in inventario:
-        if p["nombre"] == nombre:
-            return p
-    return None
+        if op == 1:
+            n = input("Nombre: ")
+            p = float(input("Precio: "))
+            c = int(input("Cantidad: "))
+            agregar_producto(inventario, n, p, c)
 
+        elif op == 2:
+            mostrar_inventario(inventario)
 
-def actualizar_producto(inventario, nombre, nuevo_precio=None, nueva_cantidad=None):
-    """Actualiza producto"""
-    for p in inventario:
-        if p["nombre"] == nombre:
-            if nuevo_precio is not None:
-                p["precio"] = nuevo_precio
-            if nueva_cantidad is not None:
-                p["cantidad"] = nueva_cantidad
-            print("Actualizado")
-            return
-    print("No existe")
+        elif op == 3:
+            n = input("Nombre: ")
+            print(buscar_producto(inventario, n))
 
+        elif op == 4:
+            n = input("Nombre: ")
+            p = input("Precio nuevo: ")
+            c = input("Cantidad nueva: ")
 
-def eliminar_producto(inventario, nombre):
-    """Elimina producto"""
-    for p in inventario:
-        if p["nombre"] == nombre:
-            inventario.remove(p)
-            print("Eliminado")
-            return
-    print("No existe")
+            actualizar_producto(
+                inventario,
+                n,
+                float(p) if p != "" else None,
+                int(c) if c != "" else None
+            )
 
+        elif op == 5:
+            n = input("Nombre: ")
+            eliminar_producto(inventario, n)
 
-def calcular_estadisticas(inventario):
-    """Calcula datos"""
-    if len(inventario) == 0:
-        return None
+        elif op == 6:
+            datos = calcular_estadisticas(inventario)
+            if datos:
+                print("Unidades:", datos[0])
+                print("Valor total:", datos[1])
+                print("Mas caro:", datos[2])
+                print("Mayor stock:", datos[3])
+            else:
+                print("Nada")
 
-    unidades = 0
-    valor = 0
+        elif op == 7:
+            r = input("Ruta: ")
+            guardar_csv(inventario, r)
 
-    mas_caro = inventario[0]
-    mayor_stock = inventario[0]
+        elif op == 8:
+            r = input("Ruta: ")
+            nuevos = cargar_csv(r)
 
-    for p in inventario:
-        unidades += p["cantidad"]
-        valor += p["precio"] * p["cantidad"]
+            if len(nuevos) > 0:
+                x = input("Sobrescribir? s/n: ")
 
-        if p["precio"] > mas_caro["precio"]:
-            mas_caro = p
+                if x == "s":
+                    inventario = nuevos
+                else:
+                    for p in nuevos:
+                        encontrado = buscar_producto(inventario, p["nombre"])
+                        if encontrado:
+                            encontrado["cantidad"] += p["cantidad"]
+                        else:
+                            inventario.append(p)
 
-        if p["cantidad"] > mayor_stock["cantidad"]:
-            mayor_stock = p
+        elif op == 9:
+            break
 
-    return unidades, valor, mas_caro, mayor_stock
+        else:
+            print("Mal")
+
+    except Exception:
+        print("Error")
